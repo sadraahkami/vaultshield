@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VaultShield | Deep Metadata Wiper, AES Steganography & Shredder</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;800&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="app-container">
+    <header class="header">
+      <div class="brand">
+        <div class="logo-icon">🛡️</div>
+        <div>
+          <h1>VaultShield</h1>
+          <p class="subtitle" data-i18n="app_subtitle">استودیوی امنیت، پاک‌سازی عمیق متادیتا، پنهان‌نگاری با AES-256 و امحای فایل</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button id="langToggleBtn" class="btn btn-secondary">English</button>
+      </div>
+    </header>
+
+    <main class="main-content">
+      <!-- Left Panel: Tabs -->
+      <div class="left-panel">
+        <div class="card tabs-card">
+          <div class="tabs-header">
+            <button class="tab-btn active" data-tab="wipe" id="tabBtnWipe">🛡️ پاک‌سازی متادیتا</button>
+            <button class="tab-btn" data-tab="hide" id="tabBtnHide">🔐 مخفی‌سازی در تصویر</button>
+            <button class="tab-btn" data-tab="extract" id="tabBtnExtract">🔓 استخراج از تصویر</button>
+          </div>
+
+          <!-- TAB 1: Wipe -->
+          <div class="tab-content active" id="tab-wipe">
+            <div class="dropzone" id="dropzoneWipe">
+              <input type="file" id="fileInputWipe" accept="image/*,.pdf" style="display: none;">
+              <div class="dropzone-content">
+                <div class="upload-icon">🛡️</div>
+                <h3 data-i18n="wipe_drop_title">تصاویر یا اسناد PDF را اینجا رها کنید</h3>
+                <p class="muted-text" data-i18n="wipe_drop_desc">حذف EXIF، موقعیت مکانی GPS، سریال دوربین و مشخصات هویتی</p>
+                <button class="btn btn-secondary" onclick="document.getElementById('fileInputWipe').click()" data-i18n="btn_select_file">انتخاب فایل...</button>
+              </div>
+              <div id="wipeFileInfo" class="file-info hidden">
+                <span id="wipeFileName" class="file-name"></span>
+                <button id="removeWipeFileBtn" class="btn-icon">✖</button>
+              </div>
+            </div>
+
+            <button id="btnRunWipe" class="btn btn-primary btn-block" disabled data-i18n="btn_start_wipe">پاک‌سازی کامل متادیتا و دانلود فایل امن</button>
+          </div>
+
+          <!-- TAB 2: Hide -->
+          <div class="tab-content" id="tab-hide">
+            <div class="form-group">
+              <label data-i18n="carrier_img_label">تصویر حامل (Cover Image - PNG/BMP):</label>
+              <div class="dropzone" id="dropzoneCarrier">
+                <input type="file" id="fileInputCarrier" accept="image/png,image/bmp" style="display: none;">
+                <p id="carrierFileName" class="muted-text" data-i18n="carrier_drop_hint">انتخاب تصویر پوششی PNG...</p>
+                <button class="btn btn-secondary btn-sm" onclick="document.getElementById('fileInputCarrier').click()" data-i18n="btn_select_carrier">انتخاب تصویر پوششی</button>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="secretTextInput" data-i18n="secret_data_label">پیام محرمانه برای مخفی‌سازی:</label>
+              <textarea id="secretTextInput" class="form-control" rows="4" placeholder="متن یا اطلاعات محرمانه را اینجا وارد کنید..."></textarea>
+            </div>
+
+            <div class="form-group">
+              <label for="hidePassInput" data-i18n="passphrase_label">رمز عبور رمزنگاری (AES-256-GCM):</label>
+              <input type="password" id="hidePassInput" class="form-control" placeholder="یک پسورد قوی وارد کنید...">
+            </div>
+
+            <button id="btnRunHide" class="btn btn-primary btn-block" disabled data-i18n="btn_hide_payload">رمزنگاری و تزریق نامرئی به تصویر</button>
+          </div>
+
+          <!-- TAB 3: Extract -->
+          <div class="tab-content" id="tab-extract">
+            <div class="form-group">
+              <label data-i18n="stego_img_label">تصویر حاوی داده پنهان (Stego Image):</label>
+              <div class="dropzone" id="dropzoneStego">
+                <input type="file" id="fileInputStego" accept="image/png,image/bmp" style="display: none;">
+                <p id="stegoFileName" class="muted-text" data-i18n="stego_drop_hint">انتخاب تصویر Stego PNG...</p>
+                <button class="btn btn-secondary btn-sm" onclick="document.getElementById('fileInputStego').click()" data-i18n="btn_select_stego">انتخاب تصویر حامل داده</button>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="extractPassInput" data-i18n="extract_pass_label">رمز عبور جهت رمزگشایی:</label>
+              <input type="password" id="extractPassInput" class="form-control" placeholder="رمز عبور را وارد کنید...">
+            </div>
+
+            <button id="btnRunExtract" class="btn btn-success btn-block" disabled data-i18n="btn_extract_payload">استخراج و رمزگشایی داده محرمانه</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Panel: Results -->
+      <div class="right-panel">
+        <div class="card result-card">
+          <div class="result-header">
+            <h3 data-i18n="result_header">گزارش و خروجی عملیات امنیتی</h3>
+            <button id="copyResultBtn" class="btn btn-secondary btn-sm" disabled data-i18n="btn_copy">کپی متن</button>
+          </div>
+          <div class="result-wrapper">
+            <textarea id="resultViewer" readonly placeholder="نتایج استخراج یا لاگ پاک‌سازی متادیتا در اینجا نمایش داده می‌شود..."></textarea>
+          </div>
+          <div id="statusAlert" class="status-alert hidden">
+            <div class="spinner"></div>
+            <span id="statusMsg" data-i18n="status_processing">در حال پردازش امنیتی...</span>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

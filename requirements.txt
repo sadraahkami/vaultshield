@@ -1,0 +1,5 @@
+cryptography>=42.0.0
+pillow>=10.2.0
+pypdf>=4.0.0
+PyQt6>=6.6.0
+tqdm>=4.66.0

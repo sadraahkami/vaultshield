@@ -1,0 +1,68 @@
+name: Build & Release VaultShield
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-windows:
+    name: Build & Publish Windows Binary
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pyinstaller
+
+      - name: Run Test Suite
+        run: |
+          python -m unittest discover tests
+
+      - name: Build Standalone Executable
+        run: |
+          pyinstaller VaultShield.spec --noconfirm
+
+      - name: Package Portable Zip
+        shell: pwsh
+        run: |
+          Compress-Archive -Path "dist/VaultShield.exe", "README.md", "LICENSE" -DestinationPath "dist/VaultShield-Windows-Portable.zip" -Force
+          Get-ChildItem -Path dist
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: |
+            dist/VaultShield.exe
+            dist/VaultShield-Windows-Portable.zip
+          name: "VaultShield ${{ github.ref_name }} - Privacy, Steganography & Shredder Studio"
+          body: |
+            ## 🛡️ VaultShield - Deep Metadata Wiper, AES-256 Steganography & Secure Shredder
+
+            All-in-one privacy suite for stripping digital traces, encrypting and hiding files inside images, and permanently destroying sensitive files.
+
+            ### 🚀 Highlights:
+            - 🛡️ **Zero-Trace EXIF & Metadata Stripper:** Purge GPS, device serials, author names from images and PDF documents.
+            - 🔐 **Steganography Vault (AES-256-GCM):** Invisibly hide confidential files into images with military-grade encryption.
+            - 💥 **Permanent Shredder (DoD 5220.22-M):** Multi-pass physical disk overwrite making files unrecoverable.
+            - 📦 **Zero Installation Needed:** Download standalone `.exe` below and run instantly!
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
