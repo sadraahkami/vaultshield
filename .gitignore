@@ -30,3 +30,5 @@ ENV/
 temp/
 output/
 vault_temp_*
+# Internal technical notes
+TECHNICAL_DOCS.md
